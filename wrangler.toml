@@ -10,7 +10,7 @@
 #    or classifying this repository as a static-assets-only Worker.
 # ============================================================================
 
-name = "mez-mails-bot"
+name = "MEZMAIL"
 main = "index.js"
 compatibility_date = "2025-02-01"
 workers_dev = true
@@ -31,4 +31,4 @@ CURRENCY = "INR"
 # Cloudflare Dashboard -> Storage & Databases -> KV -> Create Namespace ("MEZ_KV")
 [[kv_namespaces]]
 binding = "MEZ_KV"
-id = "00000000000000000000000000000000"
+id = "1191a2c1cd5944d099cd0242dd4d7891"
