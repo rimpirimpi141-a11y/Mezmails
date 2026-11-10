@@ -1,0 +1,34 @@
+# ============================================================================
+# 𝐌𝐄𝐙 𝐌𝐀𝐈𝐋𝐒 — Pure Serverless Cloudflare Standard Worker Configuration
+# ============================================================================
+# Fixes Cloudflare Error: "Variables cannot be added to a Worker that only has static assets."
+#
+# CRITICAL RULES ENFORCED IN THIS FILE:
+# 1. `main = "index.js"` explicitly registers the serverless ES Module Worker script.
+# 2. NO `[assets]`, NO `[site]`, and NO `public`/`dist` static asset directories exist here.
+# 3. `[build] command = ""` prevents Cloudflare Workers Builds from running `vite build`
+#    or classifying this repository as a static-assets-only Worker.
+# ============================================================================
+
+name = "mez-mails-bot"
+main = "index.js"
+compatibility_date = "2025-02-01"
+workers_dev = true
+
+# Prevent Cloudflare Git/CI auto-builder from running a static frontend build
+[build]
+command = ""
+
+# Non-secret environment variables (Secrets like BOT_TOKEN should be added in Dashboard or via `wrangler secret put BOT_TOKEN`)
+[vars]
+BOT_NAME = "𝐌𝐄𝐙 𝐌𝐀𝐈𝐋𝐒"
+SUPER_ADMIN_ID = "8838351233"
+SUPPORT_GROUP_URL = "https://t.me/MMAGROUP0"
+CURRENCY = "INR"
+
+# Standard Cloudflare KV Namespace Binding (`MEZ_KV`)
+# Replace `id` with your actual Cloudflare KV Namespace ID from:
+# Cloudflare Dashboard -> Storage & Databases -> KV -> Create Namespace ("MEZ_KV")
+[[kv_namespaces]]
+binding = "MEZ_KV"
+id = "00000000000000000000000000000000"

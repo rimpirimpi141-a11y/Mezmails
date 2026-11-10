@@ -408,16 +408,16 @@ export default function App() {
           </div>
         </section>
 
-        {/* Section 2: Complete Single-File Production Cloudflare Worker Script (index.js) */}
+        {/* Section 2: Pure Serverless Cloudflare Standard Worker Script (index.js & wrangler.toml) */}
         <section id="worker-script" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-display text-lg font-semibold text-white flex items-center gap-2">
                 <Terminal className="w-4 h-4 text-sky-400" />
-                <span>Single-File Production Cloudflare Worker Script (index.js)</span>
+                <span>Pure Serverless Standard Worker Script (index.js) & Clean wrangler.toml</span>
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Self-contained single-file ES Module (<code className="font-mono text-slate-200">index.js</code>) with zero static asset dependencies—ready to paste directly into Cloudflare Workers.
+                100% pure serverless ES Module (<code className="font-mono text-slate-200">main = "index.js"</code>) paired with a clean <code className="font-mono text-emerald-300">wrangler.toml</code> (<code className="font-mono text-sky-300">[build] command = ""</code>, zero <code className="font-mono text-rose-300">[assets]</code> blocks)—eliminating Cloudflare's <em>"Worker that only has static assets"</em> error.
               </p>
             </div>
           </div>

@@ -217,22 +217,23 @@ export const DeploymentAndWebhookGuide: React.FC = () => {
         </div>
       </div>
 
-      {/* Section 2: Step-by-Step Single-File Cloudflare Worker & KV Deployment Guide */}
+      {/* Section 2: Step-by-Step Standard Worker & wrangler.toml Deployment Guide */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div>
-            <div className="text-xs font-mono text-sky-400 mb-1">01. Single-File Worker Setup</div>
+            <div className="text-xs font-mono text-emerald-400 mb-1">01. Pure Standard Worker Fix</div>
             <h4 className="font-display font-semibold text-sm text-white">
-              Zero Static Asset Errors (index.js Only)
+              Fixes "Worker that only has static assets"
             </h4>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              In your Cloudflare Dashboard, go to <strong>Workers & Pages → Create Worker</strong>. Click <strong>Edit Code</strong> and paste the entire <code className="text-slate-200 font-mono">index.js</code> script into the single Worker file—no static asset directories or external files needed.
+              Cloudflare throws <em>"Variables cannot be added to a Worker that only has static assets"</em> when a project lacks a <code className="text-slate-200 font-mono">wrangler.toml</code> with <code className="text-sky-300 font-mono">main = "index.js"</code> or runs a static frontend build. Our clean <code className="text-emerald-300 font-mono">wrangler.toml</code> sets <code className="text-sky-300 font-mono">main = "index.js"</code>, <code className="text-sky-300 font-mono">[build] command = ""</code>, and zero <code className="text-rose-300 font-mono">[assets]</code> blocks.
             </p>
           </div>
           <pre className="mt-4 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto">
-{`Entrypoint: index.js (ES Module)
-Super Admin ID: ${SUPER_ADMIN_ID}
-Currency: Indian Rupees (₹)`}
+{`name = "mez-mails-bot"
+main = "index.js"
+[build]
+command = ""`}
           </pre>
         </div>
 
@@ -243,24 +244,25 @@ Currency: Indian Rupees (₹)`}
               KV Namespace & Secret Bindings
             </h4>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Create a KV namespace under <strong>Storage & Databases → KV</strong> and bind it to your Worker under <strong>Settings → Bindings</strong> with variable name <code className="text-sky-300 font-mono">MEZ_KV</code>. Add your <code className="text-sky-300 font-mono">BOT_TOKEN</code> under <strong>Variables and Secrets</strong>.
+              Because <code className="text-slate-200 font-mono">main = "index.js"</code> registers a server-side Standard Worker runtime, you can now freely add <code className="text-sky-300 font-mono">BOT_TOKEN</code> under <strong>Settings → Variables and Secrets</strong> and bind <code className="text-sky-300 font-mono">MEZ_KV</code> under <strong>KV Namespace Bindings</strong>.
             </p>
           </div>
           <pre className="mt-4 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto">
-{`KV Binding Name: MEZ_KV
-Secret Variable: BOT_TOKEN
-Optional Secret: WEBHOOK_SECRET`}
+{`[[kv_namespaces]]
+binding = "MEZ_KV"
+id = "<YOUR_KV_NAMESPACE_ID>"
+# Secret: BOT_TOKEN`}
           </pre>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div>
-            <div className="text-xs font-mono text-sky-400 mb-1">03. UPI QR & Gmail Stock</div>
+            <div className="text-xs font-mono text-sky-400 mb-1">03. UPI QR & Buy/Sell Gmail</div>
             <h4 className="font-display font-semibold text-sm text-white">
               In-Bot Admin Configuration
             </h4>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Open your bot on Telegram as Super Admin (<code className="text-slate-200 font-mono">{SUPER_ADMIN_ID}</code>), tap <strong>🛡️ Admin Panel</strong>, upload your payment QR image via <strong>🖼️ Add/Update UPI QR</strong>, and load Gmail accounts via <strong>➕ Add Gmail Stock</strong>.
+              Open your bot on Telegram as Super Admin (<code className="text-slate-200 font-mono">{SUPER_ADMIN_ID}</code>), tap <strong>🛡️ Admin Panel</strong>, upload your payment QR image via <strong>🖼️ Add/Update UPI QR</strong>, load stock via <strong>🛒 Manage Buy Stock</strong>, and review sellers via <strong>📤 Manage Sell Submissions</strong>.
             </p>
           </div>
           <pre className="mt-4 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto">

@@ -385,11 +385,12 @@ export default {
           {
             ok: true,
             bot: BOT_NAME,
-            architecture: "Single-File Cloudflare Worker (index.js)",
+            workerType: "Pure Serverless Standard Worker (main = index.js, zero static assets)",
             modules: ["Buy Gmail Marketplace", "Sell Gmail Submissions", "UPI QR & Payouts (₹)"],
             superAdminId: SUPER_ADMIN_ID,
             supportGroup: SUPPORT_GROUP_URL,
             kvBound: Boolean(env.MEZ_KV),
+            botTokenConfigured: Boolean(env.BOT_TOKEN),
             webhookStatus: "Listening on POST /"
           },
           null,
