@@ -1,0 +1,6 @@
+{
+  "name": "MEZ MAILS Cloudflare Worker Studio",
+  "description": "Production-ready serverless Telegram bot script for Cloudflare Workers (MEZ MAILS) with live interactive Telegram simulator, KV state inspector, and webhook deployment toolkit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
