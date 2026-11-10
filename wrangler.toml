@@ -10,7 +10,7 @@
 #    or classifying this repository as a static-assets-only Worker.
 # ============================================================================
 
-name = "MEZMAIL"
+name = "mezmail"
 main = "index.js"
 compatibility_date = "2025-02-01"
 workers_dev = true
