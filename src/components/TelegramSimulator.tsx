@@ -91,30 +91,52 @@ function renderTelegramHtml(rawHtml: string) {
   });
 }
 
-// Distinctive vibrant styles for the 7-row Admin Panel reply keyboard
-function getAdminButtonStyle(label: string): string {
-  if (label.includes('Manage Buy Stock') || label.includes('Manage Sell Submissions')) {
-    return 'bg-emerald-950/85 hover:bg-emerald-900/85 border-emerald-700/60 text-emerald-100';
+// Vibrant Green / Blue / Red Control Panel button styles matching the reference screenshots
+function getVibrantControlStyle(label: string): string {
+  if (
+    label.startsWith('🟩') ||
+    label.includes('Manage Payouts') ||
+    label.includes('Create Redeem Code') ||
+    label.includes('Add Admin') ||
+    label.includes('Set Buy/Sell Rates') ||
+    label.includes('Manage Buy Stock') ||
+    label.includes('Buy Gmail') ||
+    label.includes('Sell Gmail') ||
+    label.includes('Balance / Deposit') ||
+    label.includes('Rewards') ||
+    label.includes('Approve') ||
+    label.includes('Mark UPI Paid')
+  ) {
+    return 'bg-[#5bb85d] hover:bg-[#4ea850] border-[#4ca64e] text-white font-semibold shadow-xs';
   }
-  if (label.includes('Add/Update UPI QR') || label.includes('Manage Payouts')) {
-    return 'bg-sky-950/85 hover:bg-sky-900/85 border-sky-700/60 text-sky-100';
+  if (
+    label.startsWith('🟥') ||
+    label.includes('Toggle Withdrawals') ||
+    label.includes('Back to User Menu') ||
+    label.includes('Clear Pending Queues') ||
+    label.includes('Admin Panel') ||
+    label.includes('Reject') ||
+    label.includes('Cancel') ||
+    label.includes('Remove') ||
+    label.includes('Revoke')
+  ) {
+    return 'bg-[#e06b6b] hover:bg-[#d15858] border-[#cf5a5a] text-white font-semibold shadow-xs';
   }
-  if (label.includes('Add Force Channel') || label.includes('View/Remove Channels')) {
-    return 'bg-indigo-950/85 hover:bg-indigo-900/85 border-indigo-700/60 text-indigo-100';
+  if (
+    label.startsWith('🟦') ||
+    label.includes('View Users List') ||
+    label.includes('Add Force Channel') ||
+    label.includes('View/Remove Channels') ||
+    label.includes('Bot Stats') ||
+    label.includes('Broadcast Msg') ||
+    label.includes('Add/Update UPI QR') ||
+    label.includes('Manage Sell Submissions') ||
+    label.includes('Prev Page') ||
+    label.includes('Next Page')
+  ) {
+    return 'bg-[#4ea4f5] hover:bg-[#3b94e8] border-[#3d93e4] text-white font-semibold shadow-xs';
   }
-  if (label.includes('Create Redeem Code') || label.includes('Add Admin')) {
-    return 'bg-violet-950/85 hover:bg-violet-900/85 border-violet-700/60 text-violet-100';
-  }
-  if (label.includes('Set Buy/Sell Rates') || label.includes('Toggle Withdrawals')) {
-    return 'bg-amber-950/85 hover:bg-amber-900/85 border-amber-700/60 text-amber-100';
-  }
-  if (label.includes('Bot Stats') || label.includes('Broadcast Msg')) {
-    return 'bg-fuchsia-950/85 hover:bg-fuchsia-900/85 border-fuchsia-700/60 text-fuchsia-100';
-  }
-  if (label.includes('Back to User Menu')) {
-    return 'bg-slate-800 hover:bg-slate-700 border-slate-600 text-slate-200';
-  }
-  return 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700 text-slate-100';
+  return 'bg-[#4ea4f5] hover:bg-[#3b94e8] border-[#3d93e4] text-white font-semibold shadow-xs';
 }
 
 export const TelegramSimulator: React.FC<TelegramSimulatorProps> = ({
@@ -370,35 +392,41 @@ export const TelegramSimulator: React.FC<TelegramSimulatorProps> = ({
 
               {/* Inline Keyboard Buttons attached to Bot Message */}
               {!isUser && msg.inlineKeyboard && msg.inlineKeyboard.length > 0 && (
-                <div className="mt-1.5 w-full max-w-[90%] space-y-1">
+                <div className="mt-1.5 w-full max-w-[90%] space-y-1.5">
                   {msg.inlineKeyboard.map((row, rIdx) => (
-                    <div key={rIdx} className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                      {row.map((btn, bIdx) =>
-                        btn.url ? (
+                    <div
+                      key={rIdx}
+                      className={`grid gap-1.5 ${
+                        row.length === 3
+                          ? 'grid-cols-3'
+                          : row.length === 2
+                          ? 'grid-cols-2'
+                          : 'grid-cols-1'
+                      }`}
+                    >
+                      {row.map((btn, bIdx) => {
+                        const inlineStyle = getVibrantControlStyle(btn.text);
+                        return btn.url ? (
                           <a
                             key={bIdx}
                             href={btn.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`${
-                              row.length === 1 ? 'sm:col-span-2' : ''
-                            } flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/90 hover:bg-slate-700 text-sky-300 border border-slate-700/80 transition-colors text-center truncate`}
+                            className={`flex items-center justify-center px-3 py-2 rounded-xl text-xs border transition-all text-center truncate ${inlineStyle}`}
                           >
-                            {btn.text} ↗
+                            {btn.text.replace(/^[🟩🟦🟥]\s*/u, '')} ↗
                           </a>
                         ) : (
                           <button
                             key={bIdx}
                             type="button"
                             onClick={() => onClickInline(btn)}
-                            className={`${
-                              row.length === 1 ? 'sm:col-span-2' : ''
-                            } flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-100 border border-slate-700/80 transition-colors text-center truncate`}
+                            className={`flex items-center justify-center px-3 py-2 rounded-xl text-xs border transition-all active:scale-[0.99] text-center truncate ${inlineStyle}`}
                           >
-                            {btn.text}
+                            {btn.text.replace(/^[🟩🟦🟥]\s*/u, '')}
                           </button>
-                        )
-                      )}
+                        );
+                      })}
                     </div>
                   ))}
                 </div>
@@ -450,19 +478,21 @@ export const TelegramSimulator: React.FC<TelegramSimulatorProps> = ({
         </button>
       </form>
 
-      {/* Bottom Reply Keyboard (User Main Menu OR 7-Row Vibrant Admin Panel) */}
+      {/* Bottom Reply Keyboard (Vibrant Green / Blue / Red Control Panel Layout) */}
       <div className="p-3 bg-slate-950 border-t border-slate-800">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-medium text-slate-400">
             {keyboardMode === 'admin' && isAdmin
-              ? '🛡️ Enhanced 7-Row Vibrant Admin Panel Keyboard'
-              : '📱 User Main Menu Reply Keyboard (Buy & Sell Gmail)'}
+              ? '🛡️ Vibrant Multi-Column Admin Control Panel (🟩 Active · 🟦 View · 🟥 Toggle)'
+              : '📱 Vibrant User Control Menu (🟩 Buy/Sell · 🟦 Account/Refs · 🟥 Admin)'}
           </span>
           {isAdmin && (
             <button
               type="button"
               onClick={() =>
-                onSendText(keyboardMode === 'admin' ? '🔙 Back to User Menu' : '🛡️ Admin Panel')
+                onSendText(
+                  keyboardMode === 'admin' ? '🟥 🔙 Back to User Menu' : '🟥 🛡️ Admin Panel'
+                )
               }
               className="text-[11px] text-sky-400 hover:text-sky-300 underline whitespace-nowrap shrink-0"
             >
@@ -471,34 +501,26 @@ export const TelegramSimulator: React.FC<TelegramSimulatorProps> = ({
           )}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {bottomKeyboardRows.map((row, rowIndex) => (
             <div
               key={rowIndex}
-              className={`grid gap-1.5 ${
+              className={`grid gap-2 ${
                 row.length === 2 ? 'grid-cols-2' : 'grid-cols-1'
               }`}
             >
               {row.map((btnLabel) => {
-                const isAdminBtn = keyboardMode === 'admin' && isAdmin;
-                const btnStyle = isAdminBtn
-                  ? getAdminButtonStyle(btnLabel)
-                  : btnLabel === '🛡️ Admin Panel'
-                  ? 'bg-amber-950/75 hover:bg-amber-900/75 border-amber-700/60 text-amber-200'
-                  : btnLabel === '🛒 Buy Gmail'
-                  ? 'bg-emerald-950/75 hover:bg-emerald-900/75 border-emerald-700/60 text-emerald-200'
-                  : btnLabel === '📤 Sell Gmail'
-                  ? 'bg-sky-950/75 hover:bg-sky-900/75 border-sky-700/60 text-sky-200'
-                  : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-200';
+                const btnStyle = getVibrantControlStyle(btnLabel);
+                const cleanDisplayLabel = btnLabel.replace(/^[🟩🟦🟥]\s*/u, '');
 
                 return (
                   <button
                     key={btnLabel}
                     type="button"
                     onClick={() => onSendText(btnLabel)}
-                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all active:scale-[0.99] truncate ${btnStyle}`}
+                    className={`px-3.5 py-2.5 rounded-2xl border text-xs transition-all active:scale-[0.99] truncate ${btnStyle}`}
                   >
-                    {btnLabel}
+                    {cleanDisplayLabel}
                   </button>
                 );
               })}

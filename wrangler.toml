@@ -4,14 +4,14 @@
 # Fixes Cloudflare Error: "Variables cannot be added to a Worker that only has static assets."
 #
 # CRITICAL RULES ENFORCED IN THIS FILE:
-# 1. `main = "index.js"` explicitly registers the serverless ES Module Worker script.
+# 1. `main = "worker.js"` explicitly registers the serverless ES Module Worker script.
 # 2. NO `[assets]`, NO `[site]`, and NO `public`/`dist` static asset directories exist here.
 # 3. `[build] command = ""` prevents Cloudflare Workers Builds from running `vite build`
 #    or classifying this repository as a static-assets-only Worker.
 # ============================================================================
 
-name = "mezmail"
-main = "index.js"
+name = "mez-mails-bot"
+main = "worker.js"
 compatibility_date = "2025-02-01"
 workers_dev = true
 
@@ -22,13 +22,15 @@ command = ""
 # Non-secret environment variables (Secrets like BOT_TOKEN should be added in Dashboard or via `wrangler secret put BOT_TOKEN`)
 [vars]
 BOT_NAME = "𝐌𝐄𝐙 𝐌𝐀𝐈𝐋𝐒"
+BOT_USERNAME = "@Mezmailsbot"
 SUPER_ADMIN_ID = "8838351233"
-SUPPORT_GROUP_URL = "https://t.me/MMAGROUP0"
+SUPPORT_GROUP_URL = "https://t.me/mezmail"
 CURRENCY = "INR"
 
-# Standard Cloudflare KV Namespace Binding (`MEZ_KV`)
+# Standard Cloudflare KV Namespace Binding (`BOT_KV`)
+# Note: `worker.js` automatically supports both `BOT_KV` and `MEZ_KV` bindings.
 # Replace `id` with your actual Cloudflare KV Namespace ID from:
-# Cloudflare Dashboard -> Storage & Databases -> KV -> Create Namespace ("MEZ_KV")
+# Cloudflare Dashboard -> Storage & Databases -> KV -> Create Namespace ("BOT_KV")
 [[kv_namespaces]]
-binding = "MEZ_KV"
-id = "1191a2c1cd5944d099cd0242dd4d7891"
+binding = "BOT_KV"
+id = "00000000000000000000000000000000"

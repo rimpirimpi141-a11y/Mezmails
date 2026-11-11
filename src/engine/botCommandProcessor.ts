@@ -1,10 +1,12 @@
 import {
   BOT_DISPLAY_NAME,
+  BOT_USERNAME,
   InlineButton,
   KVStoreSnapshot,
   STOCK_CATEGORIES_META,
   SUPER_ADMIN_ID,
   SUPPORT_GROUP_URL,
+  USERS_PER_PAGE,
 } from './botSimulatorEngine';
 
 export interface BotTurnResult {
@@ -23,11 +25,69 @@ export interface BotTurnResult {
 }
 
 const CANCEL_INLINE: InlineButton[][] = [
-  [{ text: '❌ Cancel Operation', callback_data: 'cancel_state' }],
+  [{ text: '🟥 ❌ Cancel Operation', callback_data: 'cancel_state' }],
 ];
 
 function formatINR(val: number): string {
   return `₹${Number(val || 0).toFixed(2)}`;
+}
+
+function buildPaginatedUsersListReply(kv: KVStoreSnapshot, requestedPage = 1) {
+  const userIds = kv['index:users'];
+  const totalUsers = userIds.length;
+  const totalPages = Math.max(1, Math.ceil(totalUsers / USERS_PER_PAGE));
+  const page = Math.min(Math.max(1, Number(requestedPage) || 1), totalPages);
+  const startIdx = (page - 1) * USERS_PER_PAGE;
+  const pageIds = userIds.slice(startIdx, startIdx + USERS_PER_PAGE);
+
+  const lines = pageIds.map((uid, idx) => {
+    const u = kv.users[uid];
+    const rank = startIdx + idx + 1;
+    if (!u) return '';
+    const uname = u.username ? `(@${u.username.replace(/^@/, '')})` : `<i>(No Username)</i>`;
+    const refs = u.referralsCount || 0;
+    const badge = refs > 0 ? '✅' : '⚠️';
+    return (
+      `#${rank}. <b>${u.firstName}</b> ${uname}\n` +
+      `   🆔 <code>${u.id}</code> | 💎 <b>${formatINR(u.balance)}</b> | 👥 <b>${refs} refs</b> ${badge}`
+    );
+  });
+
+  const navRow: InlineButton[] = [];
+  if (page > 1) {
+    navRow.push({
+      text: '🟦 ⬅️ Prev Page',
+      callback_data: `admin_users_list:${page - 1}`,
+    });
+  }
+  navRow.push({
+    text: `📄 Page ${page}/${totalPages}`,
+    callback_data: `admin_users_page_info:${page}`,
+  });
+  if (page < totalPages) {
+    navRow.push({
+      text: '🟦 Next Page ➡️',
+      callback_data: `admin_users_list:${page + 1}`,
+    });
+  }
+
+  return {
+    page,
+    totalPages,
+    totalUsers,
+    text:
+      `🟦 👥 <b>Registered Users List (Page ${page} of ${totalPages})</b>\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📊 <b>Total Users:</b> <code>${totalUsers}</code> | <b>Showing:</b> <code>${
+        totalUsers === 0 ? 0 : startIdx + 1
+      }–${Math.min(startIdx + USERS_PER_PAGE, totalUsers)}</code>\n\n` +
+      `${lines.filter(Boolean).join('\n\n')}\n\n` +
+      `💡 <i>Use ⬅️ Prev Page / Next Page ➡️ to browse all pages (${USERS_PER_PAGE} users/page):</i>`,
+    inlineKeyboard: [
+      navRow,
+      [{ text: '🟩 💰 Credit / Debit User ₹ Balance', callback_data: 'admin_adjust_balance' }],
+    ],
+  };
 }
 
 export function processBotTextCommand(
@@ -39,7 +99,7 @@ export function processBotTextCommand(
   isSimulatedScreenshot = false
 ): BotTurnResult {
   const kv: KVStoreSnapshot = structuredClone(prevKv);
-  const text = rawInput.trim();
+  const text = rawInput.trim().replace(/^[🟩🟦🟥]\s*/u, '').trim();
   const config = kv['config:settings'];
   const stock = kv['config:stock'];
   const admins = kv['config:admins'];
@@ -126,6 +186,7 @@ export function processBotTextCommand(
     '⭕ Toggle Withdrawals',
     '📊 Bot Stats',
     '📢 Broadcast Msg',
+    '🗑️ Clear Pending Queues',
     '🔙 Back to User Menu',
   ];
 
@@ -914,18 +975,26 @@ export function processBotTextCommand(
     return { kv, replies, keyboardMode };
   }
 
-  // 👥 Referrals
+  // 👥 Referrals (Strictly uses @Mezmailsbot -> https://t.me/Mezmailsbot?start=ref_<userId>)
   if (text === '👥 Referrals') {
-    const refLink = `https://t.me/MEZ_MAILS_BOT?start=ref_${user.id}`;
+    const refLink = `https://t.me/${BOT_USERNAME}?start=ref_${user.id}`;
     replies.push({
       text:
-        `👥 <b>Refer & Earn Indian Rupees (₹)</b>\n` +
+        `🟦 👥 <b>Refer & Earn Indian Rupees (₹)</b>\n` +
         `━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `Invite friends to <b>${BOT_DISPLAY_NAME}</b> and earn instant Rupees directly in your wallet!\n\n` +
+        `Invite friends to <b>${BOT_DISPLAY_NAME}</b> (<code>@${BOT_USERNAME}</code>) and earn instant Rupees directly in your wallet!\n\n` +
         `🎁 <b>Per Referral Bonus:</b> <code>${formatINR(config.referralBonus)}</code>\n` +
         `👤 <b>Total Referrals:</b> <code>${user.referralsCount} Users</code>\n` +
         `💵 <b>Total Referral Earnings:</b> <code>${formatINR(user.referralsCount * config.referralBonus)}</code>\n\n` +
         `🔗 <b>Your Personal Invite Link:</b>\n<code>${refLink}</code>`,
+      inlineKeyboard: [
+        [
+          {
+            text: '🟩 📤 Share Referral Link on Telegram',
+            url: `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(`Buy & Sell Gmail accounts for instant ₹ via UPI on ${BOT_DISPLAY_NAME}!`)}`,
+          },
+        ],
+      ],
     });
     return { kv, replies, keyboardMode };
   }
@@ -1172,22 +1241,12 @@ export function processBotTextCommand(
       return { kv, replies, keyboardMode: 'admin' };
     }
 
-    // Row 3 Left: 👥 View Users List
+    // 👥 View Users List (Paginated 10 users per page with ⬅️ Prev Page / Next Page ➡️)
     if (text === '👥 View Users List') {
-      const lines = kv['index:users'].map((uid) => {
-        const u = kv.users[uid];
-        if (!u) return '';
-        return `• <b>${u.firstName}</b> (<code>${u.id}</code>) — <code>${formatINR(u.balance)}</code> | UPI: <code>${u.upiId || 'None'}</code>`;
-      });
+      const view = buildPaginatedUsersListReply(kv, 1);
       replies.push({
-        text:
-          `👥 <b>Registered Users Directory (${kv['index:users'].length} Total)</b>\n` +
-          `━━━━━━━━━━━━━━━━━━━━━━\n` +
-          `${lines.filter(Boolean).join('\n')}\n\n` +
-          `💡 <i>Click below to credit or debit any user's ₹ balance in MEZ_KV:</i>`,
-        inlineKeyboard: [
-          [{ text: '💰 Credit / Debit User ₹ Balance', callback_data: 'admin_adjust_balance' }],
-        ],
+        text: view.text,
+        inlineKeyboard: view.inlineKeyboard,
       });
       return { kv, replies, keyboardMode: 'admin' };
     }
@@ -1382,16 +1441,40 @@ export function processBotTextCommand(
       return { kv, replies, keyboardMode: 'admin' };
     }
 
-    // Row 7 Left: 📢 Broadcast Msg
+    // 📢 Broadcast Msg
     if (text === '📢 Broadcast Msg') {
       user.state = 'AWAITING_BROADCAST_MESSAGE';
       replies.push({
         text:
-          `📢 <b>Global Broadcast Dispatcher</b>\n` +
+          `🟦 📢 <b>Global Broadcast Dispatcher</b>\n` +
           `━━━━━━━━━━━━━━━━━━━━━━\n` +
           `Target Audience: <code>${kv['index:users'].length} Registered Users</code>\n\n` +
           `Send the announcement text (HTML supported) that you wish to broadcast to all users:`,
         inlineKeyboard: CANCEL_INLINE,
+      });
+      return { kv, replies, keyboardMode: 'admin' };
+    }
+
+    // 🗑️ Clear Pending Queues
+    if (text === '🗑️ Clear Pending Queues') {
+      const pendingOrdCount = kv['index:orders'].filter((o) => o.status === 'pending').length;
+      const pendingSubCount = kv['index:submissions'].filter((s) => s.status === 'pending').length;
+      replies.push({
+        text:
+          `🟥 🗑️ <b>Queue Maintenance & Cleanup</b>\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `• Pending Buy Orders: <code>${pendingOrdCount}</code>\n` +
+          `• Pending Sell Submissions: <code>${pendingSubCount}</code>\n\n` +
+          `Select an action below to review queues or open the paginated users list:`,
+        inlineKeyboard: [
+          [
+            {
+              text: `🟦 🧾 Review Pending Buy Orders (${pendingOrdCount})`,
+              callback_data: 'admin_review_orders',
+            },
+          ],
+          [{ text: '🟦 👥 Open Paginated Users List (Page 1)', callback_data: 'admin_users_list:1' }],
+        ],
       });
       return { kv, replies, keyboardMode: 'admin' };
     }
@@ -1819,6 +1902,32 @@ export function processBotCallbackQuery(
       replies: [],
       keyboardMode: currentKeyboardMode,
       callbackNotice: '⛔ Admin permission required',
+    };
+  }
+
+  // Admin: Paginated Users List (`admin_users_list` or `admin_users_list:<page>`)
+  if (callbackData === 'admin_users_list' || callbackData.startsWith('admin_users_list:')) {
+    const rawPage = callbackData.includes(':') ? parseInt(callbackData.split(':')[1], 10) : 1;
+    const view = buildPaginatedUsersListReply(kv, rawPage);
+    replies.push({
+      text: view.text,
+      inlineKeyboard: view.inlineKeyboard,
+    });
+    return {
+      kv,
+      replies,
+      keyboardMode: 'admin',
+      callbackNotice: `Viewing Users Page ${view.page} of ${view.totalPages}`,
+    };
+  }
+
+  if (callbackData.startsWith('admin_users_page_info:')) {
+    const p = callbackData.split(':')[1] || '1';
+    return {
+      kv,
+      replies: [],
+      keyboardMode: 'admin',
+      callbackNotice: `Page ${p} (${USERS_PER_PAGE} users per page)`,
     };
   }
 

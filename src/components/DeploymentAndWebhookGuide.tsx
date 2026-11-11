@@ -223,15 +223,15 @@ export const DeploymentAndWebhookGuide: React.FC = () => {
           <div>
             <div className="text-xs font-mono text-emerald-400 mb-1">01. Pure Standard Worker Fix</div>
             <h4 className="font-display font-semibold text-sm text-white">
-              Fixes "Worker that only has static assets"
+              worker.js + Clean wrangler.toml
             </h4>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Cloudflare throws <em>"Variables cannot be added to a Worker that only has static assets"</em> when a project lacks a <code className="text-slate-200 font-mono">wrangler.toml</code> with <code className="text-sky-300 font-mono">main = "index.js"</code> or runs a static frontend build. Our clean <code className="text-emerald-300 font-mono">wrangler.toml</code> sets <code className="text-sky-300 font-mono">main = "index.js"</code>, <code className="text-sky-300 font-mono">[build] command = ""</code>, and zero <code className="text-rose-300 font-mono">[assets]</code> blocks.
+              Our clean <code className="text-emerald-300 font-mono">wrangler.toml</code> sets <code className="text-sky-300 font-mono">main = "worker.js"</code>, <code className="text-sky-300 font-mono">[build] command = ""</code>, and zero <code className="text-rose-300 font-mono">[assets]</code> blocks—so GitHub & Wrangler auto-deployments run as a 100% pure serverless Worker.
             </p>
           </div>
           <pre className="mt-4 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto">
 {`name = "mez-mails-bot"
-main = "index.js"
+main = "worker.js"
 [build]
 command = ""`}
           </pre>
@@ -239,19 +239,19 @@ command = ""`}
 
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div>
-            <div className="text-xs font-mono text-sky-400 mb-1">02. Bind MEZ_KV & BOT_TOKEN</div>
+            <div className="text-xs font-mono text-sky-400 mb-1">02. Bind BOT_KV & BOT_USERNAME</div>
             <h4 className="font-display font-semibold text-sm text-white">
-              KV Namespace & Secret Bindings
+              KV Namespace & Bot Variables
             </h4>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Because <code className="text-slate-200 font-mono">main = "index.js"</code> registers a server-side Standard Worker runtime, you can now freely add <code className="text-sky-300 font-mono">BOT_TOKEN</code> under <strong>Settings → Variables and Secrets</strong> and bind <code className="text-sky-300 font-mono">MEZ_KV</code> under <strong>KV Namespace Bindings</strong>.
+              Bind your KV namespace as <code className="text-sky-300 font-mono">BOT_KV</code> (or <code className="text-sky-300 font-mono">MEZ_KV</code>), set <code className="text-sky-300 font-mono">BOT_USERNAME = "@Mezmailsbot"</code>, and add your <code className="text-sky-300 font-mono">BOT_TOKEN</code> under <strong>Variables and Secrets</strong>.
             </p>
           </div>
           <pre className="mt-4 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto">
 {`[[kv_namespaces]]
-binding = "MEZ_KV"
-id = "<YOUR_KV_NAMESPACE_ID>"
-# Secret: BOT_TOKEN`}
+binding = "BOT_KV"
+BOT_USERNAME = "@Mezmailsbot"
+SUPPORT_GROUP_URL = "https://t.me/mezmail"`}
           </pre>
         </div>
 
@@ -262,14 +262,13 @@ id = "<YOUR_KV_NAMESPACE_ID>"
               In-Bot Admin Configuration
             </h4>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Open your bot on Telegram as Super Admin (<code className="text-slate-200 font-mono">{SUPER_ADMIN_ID}</code>), tap <strong>🛡️ Admin Panel</strong>, upload your payment QR image via <strong>🖼️ Add/Update UPI QR</strong>, load stock via <strong>🛒 Manage Buy Stock</strong>, and review sellers via <strong>📤 Manage Sell Submissions</strong>.
+              Open your bot on Telegram as Super Admin (<code className="text-slate-200 font-mono">{SUPER_ADMIN_ID}</code>), tap <strong>🟥 🛡️ Admin Panel</strong>, browse users with <strong>🟦 👥 View Users List</strong> (10/page), upload QR via <strong>🟦 🖼️ Add/Update UPI QR</strong>, and manage stock.
             </p>
           </div>
           <pre className="mt-4 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto">
-{`UPI QR Format:
-yourupi@okaxis | Merchant Name
-Stock Format:
-mail@gmail.com:Password123`}
+{`Support: https://t.me/mezmail
+Referral: https://t.me/Mezmailsbot?start=ref_<id>
+Users List: Paginated 10/page`}
           </pre>
         </div>
       </div>

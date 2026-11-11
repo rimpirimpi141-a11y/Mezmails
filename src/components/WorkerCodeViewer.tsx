@@ -3,11 +3,11 @@ import { INDEX_JS_SOURCE, WRANGLER_TOML_SOURCE } from '../data/workerSource';
 import { Copy, Check, Download, FileCode, Search, Settings } from 'lucide-react';
 
 export const WorkerCodeViewer: React.FC = () => {
-  const [activeFile, setActiveFile] = useState<'index.js' | 'wrangler.toml'>('index.js');
+  const [activeFile, setActiveFile] = useState<'worker.js' | 'wrangler.toml'>('worker.js');
   const [copied, setCopied] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const activeSource = activeFile === 'index.js' ? INDEX_JS_SOURCE : WRANGLER_TOML_SOURCE;
+  const activeSource = activeFile === 'worker.js' ? INDEX_JS_SOURCE : WRANGLER_TOML_SOURCE;
   const lines = useMemo(() => activeSource.split('\n'), [activeSource]);
 
   const handleCopy = async () => {
@@ -18,7 +18,7 @@ export const WorkerCodeViewer: React.FC = () => {
 
   const handleDownload = () => {
     const mime =
-      activeFile === 'index.js' ? 'text/javascript;charset=utf-8' : 'text/plain;charset=utf-8';
+      activeFile === 'worker.js' ? 'text/javascript;charset=utf-8' : 'text/plain;charset=utf-8';
     const blob = new Blob([activeSource], { type: mime });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -48,17 +48,17 @@ export const WorkerCodeViewer: React.FC = () => {
           <button
             type="button"
             onClick={() => {
-              setActiveFile('index.js');
+              setActiveFile('worker.js');
               setSearchQuery('');
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors whitespace-nowrap shrink-0 ${
-              activeFile === 'index.js'
+              activeFile === 'worker.js'
                 ? 'bg-sky-950 text-sky-300 border border-sky-700'
                 : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800'
             }`}
           >
             <FileCode className="w-3.5 h-3.5 text-sky-400" />
-            <span>index.js (Pure Serverless Worker)</span>
+            <span>worker.js (Pure Serverless Worker)</span>
           </button>
 
           <button
@@ -74,19 +74,19 @@ export const WorkerCodeViewer: React.FC = () => {
             }`}
           >
             <Settings className="w-3.5 h-3.5 text-emerald-400" />
-            <span>wrangler.toml (No Static Assets)</span>
+            <span>wrangler.toml (BOT_KV · No Static Assets)</span>
           </button>
 
-          {activeFile === 'index.js' && (
+          {activeFile === 'worker.js' && (
             <div className="hidden xl:flex items-center gap-1.5 text-xs text-slate-400 ml-1">
               <span>Jump Filter:</span>
               {[
-                { label: '7-Row Admin Keyboard', query: 'getAdminPanelKeyboard' },
-                { label: 'Buy Gmail Marketplace', query: '🛒 Buy Gmail' },
-                { label: 'Sell Gmail Flow', query: '📤 Sell Gmail' },
-                { label: 'Approve & Pay Seller', query: 'sell_approve:' },
-                { label: 'Approve & Dispatch Stock', query: 'order_approve:' },
-                { label: 'UPI Withdrawals (₹)', query: 'AWAITING_UPI_WITHDRAW_AMOUNT' },
+                { label: 'Referral (@Mezmailsbot)', query: 'resolveBotUsername' },
+                { label: 'Support (t.me/mezmail)', query: 'https://t.me/mezmail' },
+                { label: 'Paginated Users (10/page)', query: 'buildPaginatedUsersView' },
+                { label: 'Vibrant Keyboards (🟩/🟦/🟥)', query: 'getAdminPanelKeyboard' },
+                { label: 'Buy Gmail', query: '🛒 Buy Gmail' },
+                { label: 'Sell Gmail', query: '📤 Sell Gmail' },
               ].map((item) => (
                 <button
                   key={item.label}

@@ -22,7 +22,7 @@ import { TelegramSimulator } from './components/TelegramSimulator';
 import { KVStoreInspector } from './components/KVStoreInspector';
 import { WorkerCodeViewer } from './components/WorkerCodeViewer';
 import { DeploymentAndWebhookGuide } from './components/DeploymentAndWebhookGuide';
-import { Copy, Check, Download, Terminal, Shield, Play, ShoppingCart, Upload } from 'lucide-react';
+import { Copy, Check, Download, Terminal, Shield, Play, ShoppingCart, Upload, Users } from 'lucide-react';
 
 function getInitialMessages(kv: KVStoreSnapshot): SimChatMessage[] {
   const cfg = kv['config:settings'];
@@ -41,17 +41,17 @@ function getInitialMessages(kv: KVStoreSnapshot): SimChatMessage[] {
       id: 2,
       sender: 'bot',
       text:
-        `✨ <b>Welcome to ${BOT_DISPLAY_NAME} Hub</b> ✨\n` +
+        `✨ <b>Welcome to ${BOT_DISPLAY_NAME} — Buy & Sell Gmail Hub</b> ✨\n` +
         `━━━━━━━━━━━━━━━━━━━━━━\n` +
         `👋 Namaste <b>Super Admin</b>! Instant automated <b>Buy Gmail</b> & <b>Sell Gmail</b> marketplace in Indian Rupees (₹).\n\n` +
-        `📤 <b>Sell Gmail Reward:</b> Earn <code>₹${cfg.sellGmailReward.toFixed(2)}</code> per approved account\n` +
-        `🛒 <b>Live Buy Stock Available:</b> <code>${totalStock} Accounts</code>\n` +
+        `🟩 📤 <b>Sell Gmail Reward:</b> Earn <code>₹${cfg.sellGmailReward.toFixed(2)}</code> per approved account\n` +
+        `🟩 🛒 <b>Live Buy Stock Available:</b> <code>${totalStock} Accounts</code>\n` +
         `  ├ 📩 Standard Gmail: <code>₹${cfg.standardGmailPrice.toFixed(2)}</code> (${stock.standard.length} in stock)\n` +
         `  ├ 🔐 2FA Verified Gmail: <code>₹${cfg.twofaGmailPrice.toFixed(2)}</code> (${stock.twofa.length} in stock)\n` +
         `  └ 💎 Aged Gmail: <code>₹${cfg.agedGmailPrice.toFixed(2)}</code> (${stock.aged.length} in stock)\n` +
-        `👥 <b>Referral Bonus:</b> <code>₹${cfg.referralBonus.toFixed(2)}</code> / friend\n` +
+        `🟦 👥 <b>Referral Link:</b> <code>https://t.me/Mezmailsbot?start=ref_${SUPER_ADMIN_ID}</code> (+₹${cfg.referralBonus}/ref)\n` +
         `💬 <b>Support Group:</b> <a href="${SUPPORT_GROUP_URL}">${SUPPORT_GROUP_URL}</a>\n\n` +
-        `👇 <i>Click 🛒 Buy Gmail, 📤 Sell Gmail, or 🛡️ Admin Panel below to test all workflows:</i>`,
+        `👇 <i>Tap any vibrant Green, Blue, or Red control button below to test all workflows:</i>`,
       timestamp: '00:01',
     },
   ];
@@ -152,7 +152,7 @@ export default function App() {
     setKeyboardMode('user');
     setUserJoinedChannels(true);
     setMessages(getInitialMessages(freshKv));
-    triggerToast('Simulator & MEZ_KV reset to defaults');
+    triggerToast('Simulator & BOT_KV reset to defaults');
   };
 
   const handleUpdateKvFromInspector = (
@@ -178,7 +178,7 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'index.js';
+    a.download = 'worker.js';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -213,13 +213,13 @@ export default function App() {
             href="#kv-inspector"
             className="hover:text-white transition-colors whitespace-nowrap shrink-0"
           >
-            MEZ_KV Inventory
+            BOT_KV Inventory
           </a>
           <a
             href="#worker-script"
             className="hover:text-white transition-colors whitespace-nowrap shrink-0"
           >
-            index.js Script
+            worker.js Script
           </a>
           <a
             href="#deployment"
@@ -238,12 +238,12 @@ export default function App() {
             {copiedWorkerTop ? (
               <>
                 <Check className="w-3.5 h-3.5" />
-                <span>Copied index.js</span>
+                <span>Copied worker.js</span>
               </>
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5" />
-                <span>Copy index.js</span>
+                <span>Copy worker.js</span>
               </>
             )}
           </button>
@@ -257,9 +257,9 @@ export default function App() {
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-slate-800 pb-6">
             <div className="space-y-2 max-w-3xl">
               <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 font-mono">
-                <span>Single-File Worker (index.js)</span>
+                <span>Pure Serverless (worker.js + BOT_KV)</span>
                 <span aria-hidden="true">·</span>
-                <span>Currency: ₹ INR & UPI Only</span>
+                <span>Bot: @Mezmailsbot</span>
                 <span aria-hidden="true">·</span>
                 <span>Super Admin ID: {SUPER_ADMIN_ID}</span>
                 <span aria-hidden="true">·</span>
@@ -269,25 +269,25 @@ export default function App() {
                   rel="noopener noreferrer"
                   className="text-sky-400 hover:underline"
                 >
-                  Support: t.me/MMAGROUP0
+                  Support: t.me/mezmail
                 </a>
               </div>
               <h1
                 className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight"
                 style={{ textWrap: 'balance' }}
               >
-                Buy & Sell Gmail Hub Bot (₹ INR & UPI)
+                Buy & Sell Gmail Hub Bot (Vibrant Control Panel UI)
               </h1>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Complete single-file Cloudflare Worker script (<code className="text-slate-200 font-mono">index.js</code>) featuring both a <strong>Sell Gmail</strong> submission & instant <code className="text-emerald-400 font-mono">₹</code> wallet reward system and a <strong>Buy Gmail</strong> stock marketplace with UPI QR code checkout, Payment Screenshot verification, auto-dispatch from <code className="text-sky-300 font-mono">MEZ_KV</code>, UPI ID payouts, and a 7-row vibrant Admin Panel.
+                100% pure serverless Cloudflare Worker (<code className="text-slate-200 font-mono">worker.js</code> + <code className="text-sky-300 font-mono">BOT_KV</code>) featuring the color-coded <strong>🟩 Green / 🟦 Blue / 🟥 Red Control Panel UI</strong>, <strong>Paginated Users List (10/page with Prev/Next)</strong>, <code className="text-emerald-400 font-mono">https://t.me/Mezmailsbot?start=ref_&lt;userId&gt;</code> referral links, and <code className="text-sky-300 font-mono">https://t.me/mezmail</code> official support.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
               <button
                 type="button"
-                onClick={() => handleSendText('🛒 Buy Gmail')}
-                className="px-3.5 py-2 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/70 text-xs font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                onClick={() => handleSendText('🟩 🛒 Buy Gmail')}
+                className="px-3 py-2 rounded-lg bg-[#5bb85d] hover:bg-[#4ea850] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
               >
                 <ShoppingCart className="w-3.5 h-3.5" />
                 <span>Test 🛒 Buy Gmail</span>
@@ -295,8 +295,8 @@ export default function App() {
 
               <button
                 type="button"
-                onClick={() => handleSendText('📤 Sell Gmail')}
-                className="px-3.5 py-2 rounded-lg bg-sky-950/80 hover:bg-sky-900 text-sky-300 border border-sky-700/70 text-xs font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                onClick={() => handleSendText('🟩 📤 Sell Gmail')}
+                className="px-3 py-2 rounded-lg bg-[#5bb85d] hover:bg-[#4ea850] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Test 📤 Sell Gmail</span>
@@ -304,8 +304,20 @@ export default function App() {
 
               <button
                 type="button"
-                onClick={() => handleSendText('🛡️ Admin Panel')}
-                className="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 text-xs font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                onClick={() => {
+                  setKeyboardMode('admin');
+                  handleSendText('🟦 👥 View Users List');
+                }}
+                className="px-3 py-2 rounded-lg bg-[#4ea4f5] hover:bg-[#3b94e8] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Test 👥 Paginated Users</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSendText('🟥 🛡️ Admin Panel')}
+                className="px-3 py-2 rounded-lg bg-[#e06b6b] hover:bg-[#d15858] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
               >
                 <Shield className="w-3.5 h-3.5" />
                 <span>Open 🛡️ Admin Panel</span>
@@ -314,10 +326,10 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleDownloadTopWorker}
-                className="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 text-xs font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                className="px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 text-xs font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download index.js</span>
+                <span>Download worker.js</span>
               </button>
             </div>
           </div>
@@ -408,16 +420,16 @@ export default function App() {
           </div>
         </section>
 
-        {/* Section 2: Pure Serverless Cloudflare Standard Worker Script (index.js & wrangler.toml) */}
+        {/* Section 2: Pure Serverless Cloudflare Standard Worker Script (worker.js & wrangler.toml) */}
         <section id="worker-script" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-display text-lg font-semibold text-white flex items-center gap-2">
                 <Terminal className="w-4 h-4 text-sky-400" />
-                <span>Pure Serverless Standard Worker Script (index.js) & Clean wrangler.toml</span>
+                <span>Pure Serverless Standard Worker Script (worker.js) & Clean wrangler.toml</span>
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                100% pure serverless ES Module (<code className="font-mono text-slate-200">main = "index.js"</code>) paired with a clean <code className="font-mono text-emerald-300">wrangler.toml</code> (<code className="font-mono text-sky-300">[build] command = ""</code>, zero <code className="font-mono text-rose-300">[assets]</code> blocks)—eliminating Cloudflare's <em>"Worker that only has static assets"</em> error.
+                100% pure serverless ES Module (<code className="font-mono text-slate-200">main = "worker.js"</code>) paired with a clean <code className="font-mono text-emerald-300">wrangler.toml</code> (<code className="font-mono text-sky-300">BOT_KV</code>, <code className="font-mono text-sky-300">BOT_USERNAME = "@Mezmailsbot"</code>, <code className="font-mono text-sky-300">[build] command = ""</code>, zero <code className="font-mono text-rose-300">[assets]</code> blocks).
               </p>
             </div>
           </div>
@@ -432,7 +444,7 @@ export default function App() {
               Webhook Registration & Single-File Cloudflare Worker Setup
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Bind your <code className="font-mono text-sky-300">MEZ_KV</code> namespace, configure your <code className="font-mono text-sky-300">BOT_TOKEN</code> secret, and connect your webhook.
+              Bind your <code className="font-mono text-sky-300">BOT_KV</code> namespace, configure your <code className="font-mono text-sky-300">BOT_TOKEN</code> secret, and connect your webhook.
             </p>
           </div>
 
@@ -444,11 +456,11 @@ export default function App() {
       <footer className="border-t border-slate-900 px-6 py-6 text-xs text-slate-500">
         <div className="max-w-[1380px] mx-auto flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span>𝐌𝐄𝐙 𝐌𝐀𝐈𝐋𝐒 Serverless Telegram Bot (Single-File index.js)</span>
+            <span>𝐌𝐄𝐙 𝐌𝐀𝐈𝐋𝐒 Serverless Telegram Bot (worker.js + BOT_KV)</span>
+            <span className="mx-2">·</span>
+            <span className="font-mono">Bot: @Mezmailsbot</span>
             <span className="mx-2">·</span>
             <span className="font-mono">Super Admin: {SUPER_ADMIN_ID}</span>
-            <span className="mx-2">·</span>
-            <span className="font-mono">Currency: ₹ INR & UPI</span>
           </div>
           <div className="flex items-center gap-4">
             <a
@@ -457,7 +469,7 @@ export default function App() {
               rel="noopener noreferrer"
               className="hover:text-slate-300 transition-colors"
             >
-              Official Support Group (t.me/MMAGROUP0)
+              Official Support Group (t.me/mezmail)
             </a>
           </div>
         </div>

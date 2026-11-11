@@ -133,8 +133,10 @@ export interface KVStoreSnapshot {
 
 export const SUPER_ADMIN_ID = 8838351233;
 export const REGULAR_USER_ID = 5192048112;
-export const SUPPORT_GROUP_URL = 'https://t.me/MMAGROUP0';
+export const SUPPORT_GROUP_URL = 'https://t.me/mezmail';
+export const BOT_USERNAME = 'Mezmailsbot';
 export const BOT_DISPLAY_NAME = '𝐌𝐄𝐙 𝐌𝐀𝐈𝐋𝐒';
+export const USERS_PER_PAGE = 10;
 
 export const STOCK_CATEGORIES_META = {
   standard: {
@@ -159,29 +161,138 @@ export const STOCK_CATEGORIES_META = {
 
 export const USER_MAIN_KEYBOARD = (isAdmin: boolean): string[][] => {
   const rows = [
-    ['🛒 Buy Gmail', '📤 Sell Gmail'],
-    ['📂 My Orders / Submissions', '💰 Balance / Deposit'],
-    ['👥 Referrals', '🎁 Rewards'],
-    ['⚙️ Settings', '❓ Help'],
+    ['🟩 🛒 Buy Gmail', '🟩 📤 Sell Gmail'],
+    ['🟦 📂 My Orders / Submissions', '🟩 💰 Balance / Deposit'],
+    ['🟦 👥 Referrals', '🟩 🎁 Rewards'],
+    ['🟦 ⚙️ Settings', '🟦 ❓ Help'],
   ];
   if (isAdmin) {
-    rows.push(['🛡️ Admin Panel']);
+    rows.push(['🟥 🛡️ Admin Panel']);
   }
   return rows;
 };
 
 export const ADMIN_PANEL_KEYBOARD: string[][] = [
-  ['🛒 Manage Buy Stock', '📤 Manage Sell Submissions'],
-  ['🖼️ Add/Update UPI QR', '💳 Manage Payouts'],
-  ['👥 View Users List', '➕ Add Force Channel'],
-  ['📋 View/Remove Channels', '🎟️ Create Redeem Code'],
-  ['👤 Add Admin', '💳 Set Buy/Sell Rates'],
-  ['⭕ Toggle Withdrawals', '📊 Bot Stats'],
-  ['📢 Broadcast Msg', '🔙 Back to User Menu'],
+  ['🟩 💳 Manage Payouts', '🟦 👥 View Users List'],
+  ['🟦 ➕ Add Force Channel', '🟦 📋 View/Remove Channels'],
+  ['🟩 🎟️ Create Redeem Code', '🟩 👤 Add Admin'],
+  ['🟩 💳 Set Buy/Sell Rates', '🟥 ⭕ Toggle Withdrawals'],
+  ['🟩 🛒 Manage Buy Stock', '🟦 📤 Manage Sell Submissions'],
+  ['🟦 📊 Bot Stats', '🟦 📢 Broadcast Msg'],
+  ['🟦 🖼️ Add/Update UPI QR', '🟥 🗑️ Clear Pending Queues'],
+  ['🟥 🔙 Back to User Menu'],
+];
+
+const EXTRA_DEMO_USERS: Array<{
+  id: number;
+  username: string;
+  firstName: string;
+  balance: number;
+  referralsCount: number;
+  upiId: string;
+}> = [
+  { id: 9266584499, username: '', firstName: 'Miss Tanuja🤎', balance: 20, referralsCount: 1, upiId: 'tanuja@ybl' },
+  { id: 8615339884, username: '', firstName: 'Vikram Singh', balance: 0, referralsCount: 0, upiId: '' },
+  { id: 6779458452, username: 'ALONE_BOY196', firstName: 'ALONE BOY', balance: 45, referralsCount: 2, upiId: 'aloneboy@paytm' },
+  { id: 8759278598, username: 'Akshatsaini6949', firstName: '👑 ROYAL BOY 🔥', balance: 110, referralsCount: 4, upiId: 'akshat@oksbi' },
+  { id: 8749457535, username: '', firstName: 'Gautam', balance: 0, referralsCount: 0, upiId: '' },
+  { id: 7491028311, username: 'rohit_tech99', firstName: 'Rohit Kumar', balance: 65, referralsCount: 3, upiId: 'rohit99@okaxis' },
+  { id: 6182930412, username: 'priya_sharma07', firstName: 'Priya Sharma', balance: 190, referralsCount: 7, upiId: 'priyasharma@ybl' },
+  { id: 7901283910, username: '', firstName: 'Karan Malhotra', balance: 30, referralsCount: 0, upiId: 'karan@paytm' },
+  { id: 8129384756, username: 'ankit_official', firstName: 'Ankit Yadav', balance: 95, referralsCount: 2, upiId: 'ankit@okicici' },
+  { id: 9012837465, username: 'neha_gupta', firstName: 'Neha Gupta', balance: 15, referralsCount: 1, upiId: 'neha@oksbi' },
+  { id: 6543219870, username: '', firstName: 'Deepak Verma', balance: 50, referralsCount: 2, upiId: 'deepak@paytm' },
+  { id: 7890123456, username: 'saurabh_king', firstName: 'Saurabh Patel', balance: 120, referralsCount: 5, upiId: 'saurabh@ybl' },
 ];
 
 export function createInitialKVSnapshot(): KVStoreSnapshot {
   const now = new Date().toISOString();
+
+  const usersMap: Record<number, UserProfile> = {
+    [SUPER_ADMIN_ID]: {
+      id: SUPER_ADMIN_ID,
+      username: 'mez_superadmin',
+      firstName: 'Super Admin',
+      balance: 540,
+      totalEarned: 1240,
+      totalWithdrawn: 700,
+      totalSpent: 120,
+      purchasedCount: 8,
+      soldMailsCount: 15,
+      referralsCount: 24,
+      referredBy: null,
+      upiId: 'mezmails@okaxis',
+      notifications: true,
+      lastDailyBonus: null,
+      state: null,
+      stateData: {},
+      joinedAt: '2026-10-01T10:00:00.000Z',
+    },
+    [REGULAR_USER_ID]: {
+      id: REGULAR_USER_ID,
+      username: 'aarav_user',
+      firstName: 'Aarav Sharma',
+      balance: 135,
+      totalEarned: 285,
+      totalWithdrawn: 150,
+      totalSpent: 75,
+      purchasedCount: 5,
+      soldMailsCount: 12,
+      referralsCount: 9,
+      referredBy: SUPER_ADMIN_ID,
+      upiId: 'aarav.sharma@paytm',
+      notifications: true,
+      lastDailyBonus: null,
+      state: null,
+      stateData: {},
+      joinedAt: '2026-10-14T16:22:00.000Z',
+    },
+    771293811: {
+      id: 771293811,
+      username: 'riya_verma',
+      firstName: 'Riya Verma',
+      balance: 80,
+      totalEarned: 300,
+      totalWithdrawn: 220,
+      totalSpent: 50,
+      purchasedCount: 2,
+      soldMailsCount: 18,
+      referralsCount: 6,
+      referredBy: SUPER_ADMIN_ID,
+      upiId: 'riyaverma@oksbi',
+      notifications: true,
+      lastDailyBonus: null,
+      state: null,
+      stateData: {},
+      joinedAt: '2026-10-20T09:10:00.000Z',
+    },
+  };
+
+  const userIds: number[] = [SUPER_ADMIN_ID, REGULAR_USER_ID, 771293811];
+
+  for (const extra of EXTRA_DEMO_USERS) {
+    userIds.push(extra.id);
+    usersMap[extra.id] = {
+      id: extra.id,
+      username: extra.username,
+      firstName: extra.firstName,
+      balance: extra.balance,
+      totalEarned: extra.balance + 40,
+      totalWithdrawn: 40,
+      totalSpent: 15,
+      purchasedCount: 1,
+      soldMailsCount: 2,
+      referralsCount: extra.referralsCount,
+      referredBy: SUPER_ADMIN_ID,
+      upiId: extra.upiId,
+      notifications: true,
+      lastDailyBonus: null,
+      state: null,
+      stateData: {},
+      joinedAt: now,
+    };
+  }
+
   return {
     'config:settings': {
       sellGmailReward: 10,
@@ -221,9 +332,9 @@ export function createInitialKVSnapshot(): KVStoreSnapshot {
     'config:admins': [SUPER_ADMIN_ID],
     'config:channels': [
       {
-        username: '@MMAGROUP0',
-        title: 'MEZ Official Support Group',
-        inviteLink: 'https://t.me/MMAGROUP0',
+        username: '@mezmail',
+        title: 'MEZ Official Support Channel',
+        inviteLink: 'https://t.me/mezmail',
         addedAt: now,
       },
     ],
@@ -247,7 +358,7 @@ export function createInitialKVSnapshot(): KVStoreSnapshot {
         createdAt: now,
       },
     },
-    'index:users': [SUPER_ADMIN_ID, REGULAR_USER_ID, 771293811],
+    'index:users': userIds,
     'index:payouts': [
       {
         id: 'UPI-739201',
@@ -325,64 +436,6 @@ export function createInitialKVSnapshot(): KVStoreSnapshot {
         processedAt: '2026-11-09 21:28',
       },
     ],
-    users: {
-      [SUPER_ADMIN_ID]: {
-        id: SUPER_ADMIN_ID,
-        username: 'mez_superadmin',
-        firstName: 'Super Admin',
-        balance: 540,
-        totalEarned: 1240,
-        totalWithdrawn: 700,
-        totalSpent: 120,
-        purchasedCount: 8,
-        soldMailsCount: 15,
-        referralsCount: 24,
-        referredBy: null,
-        upiId: 'mezmails@okaxis',
-        notifications: true,
-        lastDailyBonus: null,
-        state: null,
-        stateData: {},
-        joinedAt: '2026-10-01T10:00:00.000Z',
-      },
-      [REGULAR_USER_ID]: {
-        id: REGULAR_USER_ID,
-        username: 'aarav_user',
-        firstName: 'Aarav Sharma',
-        balance: 135,
-        totalEarned: 285,
-        totalWithdrawn: 150,
-        totalSpent: 75,
-        purchasedCount: 5,
-        soldMailsCount: 12,
-        referralsCount: 9,
-        referredBy: SUPER_ADMIN_ID,
-        upiId: 'aarav.sharma@paytm',
-        notifications: true,
-        lastDailyBonus: null,
-        state: null,
-        stateData: {},
-        joinedAt: '2026-10-14T16:22:00.000Z',
-      },
-      771293811: {
-        id: 771293811,
-        username: 'riya_verma',
-        firstName: 'Riya Verma',
-        balance: 80,
-        totalEarned: 300,
-        totalWithdrawn: 220,
-        totalSpent: 50,
-        purchasedCount: 2,
-        soldMailsCount: 18,
-        referralsCount: 6,
-        referredBy: SUPER_ADMIN_ID,
-        upiId: 'riyaverma@oksbi',
-        notifications: true,
-        lastDailyBonus: null,
-        state: null,
-        stateData: {},
-        joinedAt: '2026-10-20T09:10:00.000Z',
-      },
-    },
+    users: usersMap,
   };
 }
